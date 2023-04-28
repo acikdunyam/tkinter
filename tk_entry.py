@@ -39,7 +39,6 @@ def login_clicked():
         message=msg
     )
 
-
 # Sign in frame
 signin = ttk.Frame(root)
 signin.pack(
