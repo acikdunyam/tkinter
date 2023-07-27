@@ -4,7 +4,7 @@ import os, openai, customtkinter, pickle
 # Genel ayarlar
 root = customtkinter.CTk()
 root.title('ChatGPT Bot')
-root.geometry('600x550')
+root.geometry('600x480')
 root.iconbitmap('./icon/ai_lt.ico')
 
 # Renklendirme Özellikleri
@@ -13,15 +13,44 @@ customtkinter.set_default_color_theme('dark-blue')
 
 # Fonksiyolar
 def speak():
-    pass
+    if chat_entry.get():
+        file_name = './api/api_key'  
+        try:  
+            if os.path.isfile(file_name):
+                input_file = open(file_name, 'rb')
+                api_entry.delete(0,END) 
+                api_sifre = pickle.load(input_file)
+                #my_text.insert(END, "\nÇalışıyor..")
+                openai.api_key= api_sifre
+                openai.Model.list()
+
+                cevap = openai.Completion.create(
+                    model ="text-davinci-003",
+                    prompt = chat_entry.get(),
+                    temperature=0,
+                    max_tokens=4000,
+                    top_p = 1.0,
+                    frequency_penalty=0.0,
+                    presence_penalty=0.0
+                )
+                my_text.insert(END, (cevap["choices"][0]["text"]).strip())
+                my_text.insert(END, "\n")
+
+            else:
+                input_file=open(file_name, 'wb')
+                input_file.close() 
+                my_text.insert(END, "\nApi key almayı unuttun. Lütfen aşağıdaki sayfadan temin et!")
+        except Exception as ex:
+            my_text.insert(END, f"\nBir hata oluştu: {ex}") 
+    else:
+        my_text.insert(END, "\nHey dostum soru sormayı unuttun.")
 
 def clear():
     my_text.delete(1.0, END)
     chat_entry.delete(0, END)
 
 def key():
-    file_name = './api/api_key' 
-    
+    file_name = './api/api_key'  
     try:  
         if os.path.isfile(file_name):
             input_file = open(file_name, 'rb')
@@ -32,9 +61,9 @@ def key():
             input_file=open(file_name, 'wb')
             input_file.close() 
     except Exception as ex:
-        my_text.insert(END, f"\n\nBir hata oluştu: {ex}")   
+        my_text.insert(END, f"\nBir hata oluştu: {ex}")   
         
-    root.geometry('600x680')
+    root.geometry('600x580')
     api_frame.pack(pady=10)
 
 def save_key():
@@ -46,9 +75,9 @@ def save_key():
         api_entry.delete(0,END)    
         api_frame.pack_forget()
     except Exception as ex:
-        my_text.insert(END, f"\n\nBir hata oluştu: {ex}")
+        my_text.insert(END, f"\nBir hata oluştu: {ex}")
         
-    root.geometry('600x550')
+    root.geometry('600x480')
 
 # Text frame
 text_frame = customtkinter.CTkFrame(root)
